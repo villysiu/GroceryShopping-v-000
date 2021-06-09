@@ -8,12 +8,12 @@
 
 Item.delete_all
 
-img_source = "https://images.freeimages.com/images/small-previews/"
+img_source = "http://clipart-library.com/images_k/"
 
 
-    Item.create(name: "Banana", avator: img_source + "79/banana-1328691.jpg", price: 1)
-    Item.create(name: "Orange", avator: img_source + "434/orange-1325927.jpg", price: 2)
-    Item.create(name: "Avocado", avator: img_source + "434/orange-13227.jpg", price: 2)
-    Item.create(name: "Apple", avator: img_source + "434/orange-1325927.jpg", price: 2)
-    Item.create(name: "Cabbage", avator: img_source + "81f/cabbage-1322374.jpg", price: 2)
+    Item.create(name: "Banana", avator: img_source + "banana-transparent-png/banana-transparent-png-20.png", price: 1)
+    Item.create(name: "Orange", avator: img_source + "orange-transparent-png/orange-transparent-png-13.png", price: 2)
+    Item.create(name: "Avocado", avator: img_source + "transparent-avocado/transparent-avocado-23.png", price: 2)
+    Item.create(name: "Apple", avator: img_source + "transparent-apple/transparent-apple-17.png", price: 2)
+    Item.create(name: "Cabbage", avator: img_source + "transparent-cabbage/transparent-cabbage-8.png", price: 2)
     
