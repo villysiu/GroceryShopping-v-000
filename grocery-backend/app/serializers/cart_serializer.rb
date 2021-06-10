@@ -8,7 +8,11 @@ class CartSerializer
   
     def to_serialized_json
       self.data.to_json(include: {
-        line_items: {except: [:created_at, :updated_at]}
+        line_items: {
+          include: {
+            item: {except: [:created_at, :updated_at]}
+          },
+        except: [:created_at, :updated_at]}
         }, except:[:created_at, :updated_at])
       end
   
