@@ -1,5 +1,6 @@
 class LineItemsController < ApplicationController
   
+
 def create
   cart = Cart.find(params[:cart_id])
   cart.add_item(params[:item_id], params[:quantity])
@@ -15,10 +16,7 @@ def create
   end
 
   def destroy
-    line_item = LineItem.find_by!(item_id: params[:item_id], cart_id: params[:cart_id])
-    line_item.destroy!
-
-    render json: { status: 'SUCCESS', message: 'Item removed from cart.' }, status: :ok
+    render json: LineItem.find(params[:id]).destroy
   end
 
   
