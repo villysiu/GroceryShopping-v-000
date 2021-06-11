@@ -16,7 +16,11 @@ end
  
 
   def destroy
-    render json: LineItem.find(params[:id]).destroy
+    @cart = Cart.find(1)
+    LineItem.find(params[:id]).destroy
+    #status see other is to force method from destroy cart to show cart
+    #https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
+    redirect_to cart_path(@cart), status: :see_other
   end
 
   
