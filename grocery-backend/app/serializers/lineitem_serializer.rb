@@ -4,7 +4,7 @@ class LineitemSerializer
   
     def initialize(line_item_data)
       @data = line_item_data
-      puts "what is car"
+     
     end
   
     def to_serialized_json
