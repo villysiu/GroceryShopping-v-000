@@ -10,7 +10,7 @@ class CartSerializer
       self.data.to_json(include: {
         line_items: {
           include: {
-            item: {except: [:created_at, :updated_at]}
+            item: {except: [:avator, :created_at, :updated_at]}
           },
         except: [:created_at, :updated_at]}
         }, except:[:created_at, :updated_at])
