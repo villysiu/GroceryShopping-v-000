@@ -14,13 +14,23 @@ def create
   #render json: LineitemSerializer.new(line_item).to_serialized_json
   redirect_to cart
 end
+
+def update
+  line_item = LineItem.find(params[:id])
+  cart = Cart.find(line_item.cart_id)
+
+   line_item.update(quantity: params[:quantity].to_i)
+   redirect_to cart, status: :see_other
+  end
+ 
+
   
  
 
   def destroy
-    lineitem = LineItem.find(params[:id])
-    cart = Cart.find(lineitem.cart_id)
-    lineitem.destroy
+    line_item = LineItem.find(params[:id])
+    cart = Cart.find(line_item.cart_id)
+    line_item.destroy
 
     #status see other is to force method from destroy cart to show cart
     #https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
