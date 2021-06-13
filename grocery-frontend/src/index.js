@@ -25,19 +25,18 @@ const renderItems = (ItemsData) => {
 
 const renderItemCard = (itemObj) => {
     let itemCard = document.createElement('div')
-    itemCard.className = "col-sm-3"
+    itemCard.className = "col-sm-4"
     itemCard.dataset.id = itemObj.id
     itemCard.innerHTML = `
     
-      <p>${itemObj.name}</p>
-      <p><img class="img-thumbnail" src="${itemObj.avator}"></p>
+      <h4>${itemObj.name}</h4>
+      <p><img class="img" src="${itemObj.avator}"></p>
       <p>$${itemObj.price}</p>
       <input class="input-text" type="text" name="quantity" size="2" value="0">
       <button class="add-btn" data-item-id=${itemObj.id}>Add to cart</button>
     `
      itemCard.lastElementChild.addEventListener('click', AddItemToCart)
      left.appendChild(itemCard)
-
   }
  
 
@@ -46,7 +45,7 @@ const renderItemCard = (itemObj) => {
     .then(r => r.json())
     .then(cart_data => renderCart(cart_data))
     }
-
+  
   const renderCart = (cartObj) => {
     //checkout button is setup to link
     let cartDiv = document.createElement('div')
@@ -57,11 +56,13 @@ const renderItemCard = (itemObj) => {
     //checkout button is not implemented as it will go to another page
     cartDiv.innerHTML = `
     <p>Your cart</p>
-    <button id="checkoutBtn" data-cart-id=${cartObj.id}>Check out</button>`
+    <button id="checkoutBtn" data-cart-id=${cartObj.id} onclick="checkout_msg()">Check out</button>
+    `
     
     right.appendChild(cartDiv)
     
-      let lineitemList = document.createElement('ul')
+      let lineitemList = document.createElement('table')
+      lineitemList.innerHTML = `<tr><td>item</td><td>Unit Price</td><td>quantity</td><td></td><td></td></tr>`
       cartDiv.appendChild(lineitemList)
       cartObj.line_items.forEach(line_item => renderLineItem(line_item,lineitemList))
      
@@ -72,19 +73,23 @@ const renderItemCard = (itemObj) => {
   }
 
   const renderLineItem = (lineitem, list, e) => {
-    let lineitemLine = document.createElement('li')
-    lineitemLine.id = `lineitem-${lineitem.id}`
-    lineitemLine.innerHTML = `${lineitem.item.name} x${lineitem.quantity} @$${lineitem.item.price} each`
-
-    let deleteBtn = document.createElement('button')
-    deleteBtn.className = "delete"
-    deleteBtn.dataset.lineitemId = lineitem.id
-    deleteBtn.innerText = "delete"
-    
-    deleteBtn.addEventListener('click', deleteLineitem)
-    lineitemLine.appendChild(deleteBtn)
-    
+   //let lineitemLine = document.createElement('li')
+   let lineitemLine = document.createElement('tr')
+    //lineitemLine.id = `lineitem-${lineitem.id}`
+    lineitemLine.innerHTML = `
+      <td>${lineitem.item.name}</td>
+      <td> $${lineitem.item.price}</td>
+      <td><input class="input-text" type="text" id="quantity-${lineitem.id}" size="2" value="${lineitem.quantity}"></td>
+      <td><button id="update-btn-${lineitem.id}" data-lineitem-id=${lineitem.id}>Update</button></td>
+      <td><button id="delete-btn-${lineitem.id}" data-lineitem-id=${lineitem.id}>Delete</button></td>
+      `
     list.appendChild(lineitemLine)
+
+    let updateBtn = document.getElementById(`update-btn-${lineitem.id}`)
+    updateBtn.addEventListener('click', updateLineitem)
+
+    let deleteBtn = document.getElementById(`delete-btn-${lineitem.id}`)
+    deleteBtn.addEventListener('click', deleteLineitem)
   }
 
   const deleteLineitem = (e) => {
@@ -96,7 +101,23 @@ const renderItemCard = (itemObj) => {
      .then(data => updateCartToDom(data, e)
     )
 }
-  
+const updateLineitem = (e) => {
+
+  let updateItemObj = {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({
+      quantity: document.getElementById(`quantity-${e.target.dataset.lineitemId}`).value
+    })
+  }
+  fetch(LINEITEM_URL+`/${e.target.dataset.lineitemId}`, updateItemObj)
+    .then(r => r.json())
+   .then(data => updateCartToDom(data, e)
+  )
+}
   const AddItemToCart = (e) => {
     
     let addItemObj = {
@@ -119,11 +140,13 @@ const renderItemCard = (itemObj) => {
   }
   const updateCartToDom = (data, e) => {
     //remove the old cart
-    console.log(data.id)
+   console.log(e.target)
       let cartToRemove = document.getElementById(`cart-id-${data.id}`)
       cartToRemove.parentElement.removeChild(cartToRemove)
       
       renderCart(data)
-    // }
   }
   
+  function checkout_msg() {
+    alert("Checkout button not setup!");
+  }
