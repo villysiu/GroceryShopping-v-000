@@ -61,21 +61,22 @@ const renderItemCard = (itemObj) => {
     
     right.appendChild(cartDiv)
     
-      let lineitemList = document.createElement('table')
-      lineitemList.innerHTML = `<tr><td>item</td><td>Unit Price</td><td>quantity</td><td></td><td></td></tr>`
-      cartDiv.appendChild(lineitemList)
-      cartObj.line_items.forEach(line_item => renderLineItem(line_item,lineitemList))
+      let lineItemTable = document.createElement('table')
+      lineItemTable.innerHTML = `<tr><td>item</td><td>Unit Price</td><td>quantity</td><td></td><td></td></tr>`
+      cartDiv.appendChild(lineItemTable)
+      cartObj.line_items.forEach(line_item => renderLineItem(line_item,lineItemTable))
      
       let subtotal = document.createElement('p')
+      subtotal.id = "subtotal"
       subtotal.innerHTML = `Subtotal $${cartObj.subtotal}`
       cartDiv.appendChild(subtotal)
     
   }
 
-  const renderLineItem = (lineitem, list, e) => {
-   //let lineitemLine = document.createElement('li')
+  const renderLineItem = (lineitem, lineItemTable, e) => {
+   
    let lineitemLine = document.createElement('tr')
-    //lineitemLine.id = `lineitem-${lineitem.id}`
+    lineitemLine.id = `lineitem-${lineitem.id}`
     lineitemLine.innerHTML = `
       <td>${lineitem.item.name}</td>
       <td> $${lineitem.item.price}</td>
@@ -83,25 +84,32 @@ const renderItemCard = (itemObj) => {
       <td><button id="update-btn-${lineitem.id}" data-lineitem-id=${lineitem.id}>Update</button></td>
       <td><button id="delete-btn-${lineitem.id}" data-lineitem-id=${lineitem.id}>Delete</button></td>
       `
-    list.appendChild(lineitemLine)
+      lineItemTable.appendChild(lineitemLine)
 
     let updateBtn = document.getElementById(`update-btn-${lineitem.id}`)
-    updateBtn.addEventListener('click', updateLineitem)
+    updateBtn.addEventListener('click', editQuantityInCart)
 
     let deleteBtn = document.getElementById(`delete-btn-${lineitem.id}`)
     deleteBtn.addEventListener('click', deleteLineitem)
   }
 
-  const deleteLineitem = (e) => {
+const deleteLineitem = (e) => {
     
     fetch(LINEITEM_URL+`/${e.target.dataset.lineitemId}`, {
       method: "DELETE"
       })
       .then(r => r.json())
-     .then(data => updateCartToDom(data, e)
+     .then(data => removeLineitem(data, e)
     )
 }
-const updateLineitem = (e) => {
+const removeLineitem = (data, e) => {
+ 
+  let LineitemToRemove = document.getElementById(`lineitem-${data.id}`)
+  LineitemToRemove.parentElement.removeChild(LineitemToRemove)
+  updateSubtotal(data.cart.subtotal)
+}
+
+const editQuantityInCart = (e) => {
 
   let updateItemObj = {
     method: "PATCH",
@@ -115,8 +123,15 @@ const updateLineitem = (e) => {
   }
   fetch(LINEITEM_URL+`/${e.target.dataset.lineitemId}`, updateItemObj)
     .then(r => r.json())
-   .then(data => updateCartToDom(data, e)
+   .then(data => updateLineitem(data, e)
   )
+}
+const updateLineitem = (data, e) => {
+  
+  let LineitemToUpdate = document.getElementById(`quantity-${data.id}`)
+  LineitemToUpdate.value = data.quantity
+  updateSubtotal(data.cart.subtotal)
+
 }
   const AddItemToCart = (e) => {
     
@@ -136,16 +151,40 @@ const updateLineitem = (e) => {
     //for convience to display on the page
     fetch(LINEITEM_URL, addItemObj)
     .then(r => r.json())
-    .then(data => updateCartToDom(data, e))
+    .then(data => addLineitem(data, e))
   }
-  const updateCartToDom = (data, e) => {
+  const addLineitem = (data, e) => {
+    console.log(data)
+    let oldLineitem = document.getElementById(`lineitem-${data.id}`)
+    if (oldLineitem != null) {
+      updateLineitem(data, e)
+    }
+    else {
+      renderLineItem(data, document.querySelector('table'), e)
+    }
+    if (e.target.previousElementSibling.value > 0) {
+      e.target.previousElementSibling.value = 0
+    }
+    updateSubtotal(data.cart.subtotal)
+
+  }
+
+  const updateSubtotal = (subtotal) => {
+    document.getElementById('subtotal').innerHTML  = `Subtotal $${subtotal}`
+  }
+  // const updateCartToDom = (data, e) => {
+  //   console.log(data)
+    //reset quantity in add to cart to zero based on e
+    // if (e.target.previousElementSibling != null && e.target.previousElementSibling.value > 0) {
+    //   e.target.previousElementSibling.value = 0
+    // }
+   
     //remove the old cart
-   console.log(e.target)
-      let cartToRemove = document.getElementById(`cart-id-${data.id}`)
-      cartToRemove.parentElement.removeChild(cartToRemove)
+      // let cartToRemove = document.getElementById(`cart-id-${data.id}`)
+      // cartToRemove.parentElement.removeChild(cartToRemove)
       
-      renderCart(data)
-  }
+      // renderCart(data)
+  // }
   
   function checkout_msg() {
     alert("Checkout button not setup!");
