@@ -12,7 +12,7 @@ def create
    
   end
   render json: LineItemSerializer.new(line_item).to_serialized_json
-  #redirect_to cart
+ 
 end
 
 def update
@@ -20,22 +20,21 @@ def update
   cart = Cart.find(line_item.cart_id)
 
    line_item.update(quantity: params[:quantity].to_i)
-   render json: LineItemSerializer.new(line_item).to_serialized_json
-  #redirect_to cart, status: :see_other
+   if line_item.quantity == 0
+      line_item.destroy
+   end
+   
+
+render json: LineItemSerializer.new(line_item).to_serialized_json
   end
  
-
-  
- 
-
   def destroy
     line_item = LineItem.find(params[:id])
     cart = Cart.find(line_item.cart_id)
     line_item.destroy
     render json: LineItemSerializer.new(line_item).to_serialized_json
-    #status see other is to force method from destroy cart to show cart
-    #https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
-    #redirect_to cart, status: :see_other
+
+    #render json: LineItem.find(params[:id]).destroy
   end
 
   
