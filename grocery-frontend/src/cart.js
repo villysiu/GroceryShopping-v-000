@@ -4,21 +4,16 @@ class Cart {
       this.id = cart_obj.id;
       this.line_items = cart_obj.line_items;
     }
-    cartTotal() {
-      let line_total_array = this.line_items.map(line_item => line_item.item.price * line_item.quantity)
-      return line_total_array.reduce((a,b) => a+b)
-    }
     
   }
 
-    const getCart = () => {
+   // const getCart = () => {
         fetch(CART_URL)
         .then(r => r.json())
-        .then(cart_data => renderCart(new Cart(cart_data)))
-        }
+        .then(cart_data => renderCart(cc=new Cart(cart_data)))
+   //     }
 
     const renderCart = (current_cart) => {
-        console.log(current_cart)
     
         let cartDiv = document.createElement('div')
     //   cartDiv.className = "cart"
@@ -46,6 +41,7 @@ class Cart {
        cartDiv.appendChild(subtotal)
     
    }
+   
    const renderLineItem = (lineitem, lineItemTable, e) => {
     
     let lineitemLine = document.createElement('tr')
@@ -61,7 +57,7 @@ class Cart {
   
      let updateBtn = document.getElementById(`update-btn-${lineitem.id}`)
      updateBtn.addEventListener('click', editQuantityInCart)
-  
+     
      let deleteBtn = document.getElementById(`delete-btn-${lineitem.id}`)
      deleteBtn.addEventListener('click', deleteItemInCart)
    }
@@ -95,7 +91,7 @@ class Cart {
     )
 }
    const editQuantityInCart = (e) => {
-
+    console.log(cc.cartTotal())
         let updateItemObj = {
             method: "PATCH",
             headers: {
@@ -111,6 +107,40 @@ class Cart {
         .then(data => updateLineitem(data, e)
         )
     }
+    const removeLineitem = (data, e) => {
+        console.log(data)
+         let LineitemToRemove = document.getElementById(`lineitem-${data.id}`)
+         LineitemToRemove.parentElement.removeChild(LineitemToRemove)
+         
+         updateSubtotal(data.cart.subtotal)
+       }
+       const updateLineitem = (data, e) => {
+          console.log(data.quantity)
+          if (data.quantity > 0) {  
+            let LineitemToUpdate = document.getElementById(`quantity-${data.id}`)
+            LineitemToUpdate.value = data.quantity
+            updateSubtotal(data.cart.subtotal)
+          }
+          else {
+            removeLineitem(data, undefined)
+          }
+        }
+      
+      const addLineitem = (data, e) => {
+          console.log(data)
+          let LineitemToAdd = document.getElementById(`lineitem-${data.id}`)
+          if (LineitemToAdd == null) {
+              renderLineItem(data, document.querySelector('table'), e)
+          }
+          else {
+              updateLineitem(data, e)
+          }
+          if (e.target.previousElementSibling.value > 0) {
+            e.target.previousElementSibling.value = 0
+          }
+          updateSubtotal(data.cart.subtotal)
+      
+        }
 
    const updateSubtotal = (subtotal) => {
         document.getElementById('subtotal').innerHTML  = `Subtotal $${subtotal}`

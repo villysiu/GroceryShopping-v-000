@@ -1,8 +1,8 @@
-const getItems = () => {
+//const getItems = () => {
     fetch(ITEMS_URL)
     .then(r => r.json())
     .then(item_data => renderItems(item_data))
-}
+//}
 
 const renderItems = (ItemsData) => {
   
