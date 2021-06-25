@@ -3,6 +3,7 @@ class Cart {
 
       this.id = cart_obj.id;
       this.line_items = cart_obj.line_items;
+      this.subtotal = cart_obj.subtotal 
     }
     
   }
@@ -10,7 +11,7 @@ class Cart {
    // const getCart = () => {
         fetch(CART_URL)
         .then(r => r.json())
-        .then(cart_data => renderCart(cc=new Cart(cart_data)))
+        .then(cart_data => renderCart(new Cart(cart_data)))
    //     }
 
     const renderCart = (current_cart) => {
@@ -37,7 +38,7 @@ class Cart {
      
        let subtotal = document.createElement('p')
        subtotal.id = "subtotal"
-       subtotal.innerHTML = `Subtotal $${current_cart.cartTotal()}`
+       subtotal.innerHTML = `Subtotal $${current_cart.subtotal}`
        cartDiv.appendChild(subtotal)
     
    }
@@ -91,7 +92,7 @@ class Cart {
     )
 }
    const editQuantityInCart = (e) => {
-    console.log(cc.cartTotal())
+    
         let updateItemObj = {
             method: "PATCH",
             headers: {
